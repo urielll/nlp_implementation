@@ -1,12 +1,11 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import mxnet as mx
 import gluonnlp as nlp
 
-class Net(nn.Module):
+class SentenceCNN(nn.Module):
     def __init__(self, num_classes, vocab):
-        super(MorphConv, self).__init__()
+        super(SentenceCNN, self).__init__()
         # static embedding
         self.static = nn.Embedding(len(vocab), embedding_dim=300, padding_idx=0)
         self.static.weight.data.copy_(torch.from_numpy(vocab.embedding.idx_to_vec.asnumpy()))

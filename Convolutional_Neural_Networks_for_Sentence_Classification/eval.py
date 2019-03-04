@@ -1,41 +1,33 @@
+import os, sys
 import torch
-import gluonnlp as nlp
-import pandas as pd
 import numpy as np
-from torch.utils.data import TensorDataset
+import gluonnlp as nlp
+from model.data import NSMC
+from model.net import SentenceCNN
 from torch.utils.data import DataLoader
-from supervised.model import MorphConv
 from mecab import MeCab
 
-ckpt = torch.load('saved_model/trained.tar')
+# Restoring model
+ckpt = torch.load('./checkpoint/trained.tar')
 vocab = ckpt['vocab']
-model = MorphConv(num_classes=2, vocab=vocab)
+model = SentenceCNN(num_classes=2, vocab=vocab)
 model.load_state_dict(ckpt['model_state_dict'])
 model.eval()
 
-# preparing tst_dataset
-mecab_tagger = MeCab()
-tst = pd.read_table('sample_data/ratings_test.txt').loc[:,['document','label']]
-tst = tst.loc[tst['document'].isna().apply(lambda elm : not elm), :]
-tst['document'] = tst['document'].apply(mecab_tagger.morphs)
+# Creating Dataset, Dataloader
+tagger = MeCab()
+padder = nlp.data.PadSequence(length=30)
+tst_filepath = os.path.join(os.getcwd(), 'data/preprocessed_test.txt')
 
-pad_sequence = nlp.data.PadSequence(length=30, pad_val=0)
-x_tst = tst['document'].apply(lambda sen : pad_sequence([vocab.token_to_idx[token] for token in sen])).tolist()
-x_tst = torch.tensor(x_tst)
-y_tst = torch.tensor(tst['label'].tolist())
+tst_ds = NSMC(tst_filepath, vocab, tagger, padder)
+tst_dl = DataLoader(tst_ds, batch_size=100, num_workers=4)
 
-# dataloader
-tst_dataset = TensorDataset(x_tst, y_tst)
-tst_dataloader = DataLoader(dataset=tst_dataset, batch_size=100, num_workers=4)
-
-# evaluation
-results = np.array([])
-for x_mb, y_mb in tst_dataloader:
+# Evaluation
+correct_count = 0
+for x_mb, y_mb in tst_dl:
     with torch.no_grad():
         y_mb_hat = model(x_mb)
         y_mb_hat = torch.max(y_mb_hat, 1)[1].numpy()
-        results = np.append(results, y_mb_hat)
+        correct_count += np.sum((y_mb_hat) == y_mb.numpy())
 
-print('Acc : {:.2%}'.format(np.mean(results == y_tst.numpy())))
-
-
+print('Acc : {:.2%}'.format(correct_count / len(tst_ds)))

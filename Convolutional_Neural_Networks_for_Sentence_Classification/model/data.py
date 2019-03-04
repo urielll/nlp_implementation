@@ -1,22 +1,30 @@
 import os
 import pandas as pd
+import gluonnlp as nlp
+import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-# dataset = pd.read_table(os.path.join(os.getcwd(), 'data/ratings_train.txt'))
+from mecab import MeCab
 
 class NSMC(Dataset):
-    def __init__(self, filepath, vocab):
+    def __init__(self, filepath, vocab, tagger, padder):
         self.corpus = pd.read_table(filepath).loc[:,['document', 'label']]
+        self.vocab = vocab
+        self.tagger = tagger
+        self.padder = padder
 
     def __len__(self):
         return len(self.corpus)
 
     def __getitem__(self, idx):
-        return self.corpus.iloc[idx]
+        tokenized = self.tagger.morphs(self.corpus.iloc[idx]['document'])
+        tokenized2indices = torch.tensor(self.padder([self.vocab.token_to_idx[token] for token in tokenized]))
+        labels = torch.tensor(self.corpus.iloc[idx]['label'])
+        return tokenized2indices, labels
 
-nsmc_ds = NSMC(os.path.join(os.getcwd(), 'data/ratings_train.txt'))
-nsmc_dl = DataLoader(dataset=nsmc_ds,batch_size=2, shuffle=True)
 
 
-for x_mb, y_mb in nsmc_dl:
-    print(x_mb)
+
+
+
+
