@@ -26,6 +26,9 @@ class SentenceCNN(nn.Module):
         # dropout
         self.drop = nn.Dropout()
 
+        # initialization
+        self.apply(self.__init_weights)
+
     def forward(self, x):
         # Embedding layer
         static_batch = self.static(x)
@@ -52,3 +55,9 @@ class SentenceCNN(nn.Module):
         score = self.fc(feature)
 
         return score
+
+    def __init_weights(self, layer):
+        if isinstance(layer, nn.Conv1d):
+            nn.init.kaiming_uniform_(layer.weight)
+        elif isinstance(layer, nn.Linear):
+            nn.init.xavier_normal_(layer.weight)

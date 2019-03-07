@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from mecab import MeCab
 
-class NSMC(Dataset):
+class Corpus(Dataset):
     def __init__(self, filepath, vocab, tagger, padder):
         self.corpus = pd.read_table(filepath).loc[:,['document', 'label']]
         self.vocab = vocab
