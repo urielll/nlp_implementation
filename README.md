@@ -1,8 +1,8 @@
 # NLP paper implementation with PyTorch
 ### Classification
-* Convolutional Neural Networks for Sentence Classification
+* Convolutional Neural Networks for Sentence Classification [x]
   + https://arxiv.org/abs/1408.5882
-* Character-level Convolutional Networks for Text Classification
+* Character-level Convolutional Networks for Text Classification [x]
   + https://arxiv.org/abs/1509.01626
 * Efficient Character-level Document Classification by Combining Convolution and Recurrent Layers
   + https://arxiv.org/abs/1602.00367
