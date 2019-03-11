@@ -1,4 +1,4 @@
-import os, sys
+import os
 import pandas as pd
 import gluonnlp as nlp
 import itertools
@@ -7,13 +7,15 @@ from mecab import MeCab
 from sklearn.model_selection import train_test_split
 
 # loading dataset
-data = pd.read_table('./data/ratings_train.txt').loc[:,['document', 'label']]
-data = data.loc[data['document'].isna().apply(lambda elm : not elm),:]
+tr_filepath = os.path.join(os.getcwd(), 'data/ratings_train.txt')
+data = pd.read_table(tr_filepath).loc[:, ['document', 'label']]
+data = data.loc[data['document'].isna().apply(lambda elm : not elm), :]
 
 tr_data, val_data = train_test_split(data, test_size=.2)
 
-tst_data = pd.read_table('./data/ratings_test.txt').loc[:,['document', 'label']]
-tst_data = tst_data.loc[tst_data['document'].isna().apply(lambda elm : not elm),:]
+tst_filepath = os.path.join(os.getcwd(), 'data/ratings_test.txt')
+tst_data = pd.read_table(tst_filepath).loc[:, ['document', 'label']]
+tst_data = tst_data.loc[tst_data['document'].isna().apply(lambda elm : not elm), :]
 
 # extracting morph in sentences
 analyzer = MeCab()
@@ -28,7 +30,7 @@ ptr_embedding = nlp.embedding.create('fasttext', source='wiki.ko')
 vocab.set_embedding(ptr_embedding)
 
 # saving vocab
-with open('./data/vocab.pkl', mode = 'wb') as io:
+with open('./resource/vocab.pkl', mode = 'wb') as io:
     pickle.dump(vocab, io)
 
 # saving tr_data, val_data, tst_data

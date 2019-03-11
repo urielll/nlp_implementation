@@ -1,10 +1,17 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import gluonnlp as nlp
+from gluonnlp import Vocab
 
 class SentenceCNN(nn.Module):
-    def __init__(self, num_classes, vocab):
+    """SentenceCNN class"""
+    def __init__(self, num_classes: int, vocab: Vocab) -> None:
+        """Instantiating SentenceCNN class
+
+        Args:
+            num_classes (int): the number of classes
+            vocab (gluonnlp.Vocab): the instance of gluonnlp.Vocab
+        """
         super(SentenceCNN, self).__init__()
         # static embedding
         self.static = nn.Embedding(len(vocab), embedding_dim=300, padding_idx=0)
@@ -29,13 +36,13 @@ class SentenceCNN(nn.Module):
         # initialization
         self.apply(self.__init_weights)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Embedding layer
         static_batch = self.static(x)
-        static_batch = static_batch.permute(0,2,1) # for Conv1d
+        static_batch = static_batch.permute(0, 2, 1) # for Conv1d
 
         non_static_batch = self.non_static(x)
-        non_static_batch = non_static_batch.permute(0,2,1) # for Conv1d
+        non_static_batch = non_static_batch.permute(0, 2, 1) # for Conv1d
 
         # Convolution layer (extract feature)
         tri_feature = F.relu(self.tri_gram(static_batch)) + F.relu(self.tri_gram(non_static_batch))
@@ -56,7 +63,7 @@ class SentenceCNN(nn.Module):
 
         return score
 
-    def __init_weights(self, layer):
+    def __init_weights(self, layer) -> None:
         if isinstance(layer, nn.Conv1d):
             nn.init.kaiming_uniform_(layer.weight)
         elif isinstance(layer, nn.Linear):

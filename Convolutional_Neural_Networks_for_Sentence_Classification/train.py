@@ -1,4 +1,4 @@
-import os, sys
+import os
 import pickle
 import gluonnlp as nlp
 import torch
@@ -13,30 +13,29 @@ from tqdm import tqdm
 # Creating Dataset, DataLoader
 tagger = MeCab()
 padder = nlp.data.PadSequence(length=30)
-with open('./data/vocab.pkl', mode='rb') as io:
+with open('./resource/vocab.pkl', mode='rb') as io:
     vocab = pickle.load(io)
 
 tr_filepath = os.path.join(os.getcwd(), 'data/preprocessed_train.txt')
 val_filepath = os.path.join(os.getcwd(), 'data/preprocessed_val.txt')
 
 tr_ds = Corpus(tr_filepath, vocab, tagger, padder)
-tr_dl = DataLoader(tr_ds, batch_size=100, shuffle=True, num_workers=4, drop_last=True)
+tr_dl = DataLoader(tr_ds, batch_size=128, shuffle=True, num_workers=4, drop_last=True)
 
 val_ds = Corpus(val_filepath, vocab, tagger, padder)
-val_dl = DataLoader(val_ds, batch_size=100)
+val_dl = DataLoader(val_ds, batch_size=128)
 
 # Creating model
 model = SentenceCNN(num_classes=2, vocab=vocab)
 
-
 # training
 loss_fn = nn.CrossEntropyLoss()
-opt = optim.Adam(params = model.parameters(), lr =1e-3)
+opt = optim.Adam(params = model.parameters(), lr=1e-3)
 
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 model.to(device)
 
-epochs = 5
+epochs = 10
 
 for epoch in tqdm(range(epochs), desc='epochs'):
 
@@ -46,7 +45,6 @@ for epoch in tqdm(range(epochs), desc='epochs'):
     val_step = 0
 
     model.train()
-
     for x_mb, y_mb in tqdm(tr_dl, desc='iters'):
         x_mb = x_mb.to(device)
         y_mb = y_mb.to(device)
@@ -65,7 +63,7 @@ for epoch in tqdm(range(epochs), desc='epochs'):
         avg_tr_loss /= tr_step
 
     model.eval()
-    for x_mb, y_mb in val_dl:
+    for x_mb, y_mb in tqdm(val_dl):
         x_mb = x_mb.to(device)
         y_mb = y_mb.to(device)
 
@@ -80,9 +78,9 @@ for epoch in tqdm(range(epochs), desc='epochs'):
     tqdm.write('epoch : {}, tr_loss : {:.3f}, val_loss : {:.3f}'.format(epoch + 1, avg_tr_loss, avg_val_loss))
 
 ckpt = {'epoch': epoch,
-        'model_state_dict' : model.state_dict(),
-        'opt_state_dict' : opt.state_dict(),
-        'vocab' : vocab}
+        'model_state_dict': model.state_dict(),
+        'opt_state_dict': opt.state_dict(),
+        'vocab': vocab}
 
 torch.save(ckpt, './checkpoint/model_ckpt.tar')
 
