@@ -1,10 +1,9 @@
 import re
 
 class JamoTokenizer:
-    """JamoTokenizer for korean"""
-    def __init__(self):
-        """Instantiating JamoTokenizer
-        """
+    """JamoTokenizer class"""
+    def __init__(self) -> None:
+        """Instantiating JamoTokenizer class"""
         # 유니코드 한글 시작 : 44032, 끝 : 55199
         self.__base_code = 44032
         self.__chosung = 588
@@ -24,24 +23,24 @@ class JamoTokenizer:
 
         self.token2idx = sorted(
             list(set(self.__chosung_list + self.__jungsung_list + self.__jongsung_list)))
-        self.token2idx = ["<pad>", "<eng>", "<num>", "<unk>"] + self.token2idx
+        self.token2idx = ['<pad>', '<eng>', '<num>', '<unk>'] + self.token2idx
         self.token2idx = {token: idx for idx, token in enumerate(self.token2idx)}
 
     def tokenize(self, string: str) -> list:
         """Tokenizing string to sequences of indices
 
         Args:
-            string: characters
+            string (str): characters
 
         Returns:
-            sequence of tokens: list of characters
+            sequence of tokens (list): list of characters
         """
         split_string = list(string)
 
         sequence_of_tokens = []
         for char in split_string:
             # 한글 여부 check 후 분리
-            if re.match(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*", char) is not None:
+            if re.match('.*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*', char) is not None:
                 if ord(char) < self.__base_code:
                     sequence_of_tokens.append(char)
                     continue
@@ -65,19 +64,19 @@ class JamoTokenizer:
         """Transforming sequences of tokens to sequences of indices
 
         Args:
-            sequence_of_tokens: list of characters
+            sequence_of_tokens (list): list of characters
 
         Returns:
-            sequence_of_indices: list of integers
+            sequence_of_indices (list): list of integers
         """
         sequence_of_indices = []
         for token in sequence_of_tokens:
-            if re.match(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*", token) is not None:
+            if re.match('.*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*', token) is not None:
                 sequence_of_indices.append(self.token2idx.get(token))
             else:
-                if re.match("[0-9]", token) is not None:
+                if re.match('[0-9]', token) is not None:
                     sequence_of_indices.append(self.token2idx.get('<num>'))
-                elif re.match("[A-z]", token) is not None:
+                elif re.match('[A-z]', token) is not None:
                     sequence_of_indices.append(self.token2idx.get('<eng>'))
                 else:
                     sequence_of_indices.append(self.token2idx.get('<unk>'))
@@ -88,10 +87,10 @@ class JamoTokenizer:
         """Tokenizing and transforming string to sequence
 
         Args:
-            string: characters
+            string (str): characters
 
         Returns:
-            sequence_of_indices: list of integers
+            sequence_of_indices (list): list of integers
         """
         sequence_of_indices = self.transform(self.tokenize(string))
 

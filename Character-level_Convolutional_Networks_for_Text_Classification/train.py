@@ -26,9 +26,9 @@ model = CharCNN(num_classes=2, embedding_dim=64, dic=tokenizer.token2idx)
 
 # training
 loss_fn = nn.CrossEntropyLoss()
-opt = optim.Adam(params = model.parameters(), lr =1e-3)
+opt = optim.Adam(params=model.parameters(), lr=1e-3)
 
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 model.to(device)
 
 epochs = 10
@@ -41,7 +41,6 @@ for epoch in tqdm(range(epochs), desc='epochs'):
     val_step = 0
 
     model.train()
-
     for x_mb, y_mb in tqdm(tr_dl, desc='iters'):
         x_mb = x_mb.to(device)
         y_mb = y_mb.to(device)
@@ -58,7 +57,7 @@ for epoch in tqdm(range(epochs), desc='epochs'):
         avg_tr_loss /= tr_step
 
     model.eval()
-    for x_mb, y_mb in val_dl:
+    for x_mb, y_mb in tqdm(val_dl):
         x_mb = x_mb.to(device)
         y_mb = y_mb.to(device)
 
@@ -73,7 +72,7 @@ for epoch in tqdm(range(epochs), desc='epochs'):
     tqdm.write('epoch : {}, tr_loss : {:.3f}, val_loss : {:.3f}'.format(epoch + 1, avg_tr_loss, avg_val_loss))
 
 ckpt = {'epoch': epoch,
-        'model_state_dict' : model.state_dict(),
-        'opt_state_dict' : opt.state_dict()}
+        'model_state_dict': model.state_dict(),
+        'opt_state_dict': opt.state_dict()}
 
 torch.save(ckpt, './checkpoint/model_ckpt.tar')

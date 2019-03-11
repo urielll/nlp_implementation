@@ -3,14 +3,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class CharCNN(nn.Module):
-    """CharCNN model"""
+    """CharCNN class"""
     def __init__(self, num_classes: int, embedding_dim: int, dic: dict) -> None:
         """Instantiating CharCNN
 
         Args:
-            num_classes: number of classes
-            embedding_dim: embedding dimension of token
-            dic: token2idx
+            num_classes (int): number of classes
+            embedding_dim (int): embedding dimension of token
+            dic (dict): token2idx
         """
         super(CharCNN, self).__init__()
         self.embedding = nn.Embedding(len(dic), embedding_dim, padding_idx=0)
@@ -39,7 +39,7 @@ class CharCNN(nn.Module):
         flatten = fmap.view(fmap.shape[0], -1)
         dense = F.dropout(F.relu(self.fc1(flatten)))
         dense = F.dropout(F.relu(self.fc2(dense)))
-        score = F.dropout(self.fc3(dense))
+        score = self.fc3(dense)
         return score
 
     def __init_weights(self, layer) -> None:
