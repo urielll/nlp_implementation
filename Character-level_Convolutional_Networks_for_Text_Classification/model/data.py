@@ -4,11 +4,9 @@ from torch.utils.data import Dataset
 from gluonnlp import Vocab
 from gluonnlp.data import PadSequence
 from mecab import MeCab
-from model.supervised.utils import JamoTokenizer
-
+from model.utils import JamoTokenizer
 
 class Corpus(Dataset):
-    """Corpus for JamoCNN class"""
     def __init__(self, filepath: str, tokenizer: JamoTokenizer, padder: PadSequence) -> None:
         """Instantiating CorpusForJamoCNN
 

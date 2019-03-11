@@ -42,6 +42,10 @@ class JamoTokenizer:
         for char in split_string:
             # 한글 여부 check 후 분리
             if re.match(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*", char) is not None:
+                if ord(char) < self.__base_code:
+                    sequence_of_tokens.append(char)
+                    continue
+
                 char_code = ord(char) - self.__base_code
                 alphabet1 = int(char_code / self.__chosung)
                 sequence_of_tokens.append(self.__chosung_list[alphabet1])
