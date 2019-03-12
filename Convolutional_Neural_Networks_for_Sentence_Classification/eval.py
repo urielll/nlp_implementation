@@ -10,10 +10,11 @@ from gluonnlp.data import PadSequence
 from tqdm import tqdm
 
 def evaluate(cfgpath):
+    # parsing json
     with open(os.path.join(os.getcwd(), cfgpath)) as io:
         params = json.loads(io.read())
 
-    # Restoring model
+    # restoring model
     savepath = os.path.join(os.getcwd(), params['filepath'].get('ckpt'))
     ckpt = torch.load(savepath)
 
@@ -22,7 +23,7 @@ def evaluate(cfgpath):
     model.load_state_dict(ckpt['model_state_dict'])
     model.eval()
 
-    # Creating Dataset, Dataloader
+    # creating dataset, dataloader
     tagger = MeCab()
     padder = PadSequence(length=30)
     tst_filepath = os.path.join(os.getcwd(), params['filepath'].get('tst'))
@@ -32,7 +33,8 @@ def evaluate(cfgpath):
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model.to(device)
-    # Evaluation
+
+    # evaluation
     correct_count = 0
     for x_mb, y_mb in tqdm(tst_dl):
         x_mb = x_mb.to(device)

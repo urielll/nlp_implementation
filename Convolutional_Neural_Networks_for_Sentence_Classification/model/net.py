@@ -37,14 +37,14 @@ class SentenceCNN(nn.Module):
         self.apply(self.__init_weights)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # Embedding layer
+        # embedding layer
         static_batch = self.static(x)
         static_batch = static_batch.permute(0, 2, 1) # for Conv1d
 
         non_static_batch = self.non_static(x)
         non_static_batch = non_static_batch.permute(0, 2, 1) # for Conv1d
 
-        # Convolution layer (extract feature)
+        # convolution layer (extract feature)
         tri_feature = F.relu(self.tri_gram(static_batch)) + F.relu(self.tri_gram(non_static_batch))
         tetra_feature = F.relu(self.tetra_gram(static_batch)) + F.relu(self.tetra_gram(non_static_batch))
         penta_feature = F.relu(self.penta_gram(static_batch)) + F.relu(self.penta_gram(non_static_batch))

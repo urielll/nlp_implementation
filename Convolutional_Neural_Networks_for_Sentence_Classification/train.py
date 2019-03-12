@@ -13,6 +13,7 @@ from gluonnlp.data import PadSequence
 from tqdm import tqdm
 
 def train(cfgpath):
+    # parsing json
     with open(os.path.join(os.getcwd(), cfgpath)) as io:
         params = json.loads(io.read())
 
@@ -22,7 +23,7 @@ def train(cfgpath):
     # creating model
     model = SentenceCNN(num_classes=params['model'].get('num_classes'), vocab=vocab)
 
-    # creating dataset, dataLoader
+    # creating dataset, dataloader
     tagger = MeCab()
     padder = PadSequence(length=30)
 
