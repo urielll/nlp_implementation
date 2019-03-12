@@ -10,8 +10,8 @@ class Corpus(Dataset):
         """Instantiating Corpus class
 
         Args:
-            filepath: filepath
-            padder: instance of gluonnlp.data.PadSequence
+            filepath (str): filepath
+            padder (gluonnlp.data.PadSequence): instance of gluonnlp.data.PadSequence
         """
         self.corpus = pd.read_table(filepath).loc[:, ['document', 'label']]
         self.padder = padder
