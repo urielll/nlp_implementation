@@ -18,8 +18,8 @@ tst_data = pd.read_table(tst_filepath).loc[:, ['document', 'label']]
 tst_data = tst_data.loc[tst_data['document'].isna().apply(lambda elm : not elm), :]
 
 # extracting morph in sentences
-analyzer = MeCab()
-data['document'] = data['document'].apply(analyzer.morphs)
+tokenizer = MeCab()
+data['document'] = data['document'].apply(tokenizer.morphs)
 
 # making the vocab
 counter = nlp.data.count_tokens(itertools.chain.from_iterable([token for token in data['document']]))
@@ -30,7 +30,7 @@ ptr_embedding = nlp.embedding.create('fasttext', source='wiki.ko')
 vocab.set_embedding(ptr_embedding)
 
 # saving vocab
-with open('./resource/vocab.pkl', mode = 'wb') as io:
+with open('./data/vocab.pkl', mode = 'wb') as io:
     pickle.dump(vocab, io)
 
 # saving tr_data, val_data, tst_data
